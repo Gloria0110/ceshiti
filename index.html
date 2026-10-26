@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>测测你的本命定居城市 | 你最适合在哪长期定居？</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F4EFE6;--ink:#1C1917;--muted:#78716C;--accent:#9A3412;
+    --line:#D8CFBE;--card:#FBF7EF;
+    --serif:"Noto Serif SC","Songti SC",serif;
+    --sans:"Inter","PingFang SC","Microsoft YaHei",sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{background:var(--bg)}
+  body{color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;line-height:1.6;min-height:100vh}
+  .app{max-width:420px;margin:0 auto;padding:0 26px 60px}
+  .topbar{padding:18px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;font-size:10px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase}
+  .topbar b{color:var(--accent);font-weight:600}
+  section.page{display:none;animation:fadeIn .5s ease both}
+  section.page.active{display:block}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+  .cover{padding:70px 0 50px;text-align:center}
+  .cover .eyebrow{font-size:11px;letter-spacing:.35em;color:var(--accent);text-transform:uppercase;margin-bottom:28px;font-weight:500}
+  .cover h1{font-family:var(--serif);font-weight:600;font-size:40px;line-height:1.25;letter-spacing:.01em;margin-bottom:18px}
+  .cover .sub{font-family:var(--serif);font-size:16px;color:var(--muted);font-style:italic;margin-bottom:30px}
+  .cover .lead{font-size:14px;color:var(--muted);max-width:300px;margin:0 auto 40px;line-height:1.9}
+  .cta{display:inline-block;background:var(--ink);color:var(--bg);padding:16px 48px;font-size:13px;letter-spacing:.25em;border:none;cursor:pointer;font-family:var(--sans);text-transform:uppercase;transition:transform .2s}
+  .cta:active{transform:scale(.97)}
+  .cover .meta{margin-top:36px;font-size:11px;color:var(--muted);letter-spacing:.1em}
+
+  .quiz{padding:30px 0}
+  .progress-row{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);letter-spacing:.15em;margin-bottom:12px}
+  .bar{height:1px;background:var(--line);margin-bottom:36px;position:relative}
+  .bar .fill{position:absolute;left:0;top:0;height:1px;background:var(--accent);transition:width .5s ease}
+  .q-tag{font-size:11px;letter-spacing:.3em;color:var(--accent);text-transform:uppercase;margin-bottom:14px;font-weight:500}
+  .quiz h2{font-family:var(--serif);font-size:23px;font-weight:600;line-height:1.5;margin-bottom:30px;min-height:70px}
+  .opt{padding:17px 0;border-bottom:1px solid var(--line);font-size:15px;display:flex;gap:14px;align-items:baseline;color:var(--ink);cursor:pointer;transition:all .2s;animation:fadeIn .4s ease both}
+  .opt:nth-child(2){animation-delay:.05s}.opt:nth-child(3){animation-delay:.1s}.opt:nth-child(4){animation-delay:.15s}
+  .opt .key{font-family:var(--serif);font-size:13px;color:var(--muted);width:14px;flex-shrink:0;transition:color .2s}
+  .opt:active{transform:scale(.99)}
+  .opt.selected{color:var(--accent)}
+  .opt.selected .key{color:var(--accent)}
+  .btn-row{display:flex;gap:10px;margin-top:30px}
+  .btn-back{flex:2;background:none;border:1px solid var(--line);padding:14px 0;font-size:12px;letter-spacing:.15em;cursor:pointer;color:var(--muted);font-family:var(--sans);opacity:.3;pointer-events:none;transition:opacity .3s}
+  .btn-back.ready{opacity:1;pointer-events:auto;color:var(--ink)}
+  .next{flex:8;background:none;border:1px solid var(--ink);padding:14px 0;font-size:12px;letter-spacing:.25em;cursor:pointer;color:var(--ink);font-family:var(--sans);text-transform:uppercase;opacity:.3;pointer-events:none;transition:opacity .3s}
+  .next.ready{opacity:1;pointer-events:auto}
+  .next:active{background:var(--ink);color:var(--bg)}
+
+  .result{padding:40px 0;text-align:center}
+  .result .eyebrow{font-size:11px;letter-spacing:.35em;color:var(--accent);text-transform:uppercase;margin-bottom:16px;font-weight:500}
+  .result .rank{font-family:var(--serif);font-size:13px;color:var(--muted);letter-spacing:.4em;margin-bottom:10px}
+  .result h2{font-family:var(--serif);font-size:58px;font-weight:600;letter-spacing:.06em;margin-bottom:10px;animation:popIn .7s cubic-bezier(.2,.8,.2,1) both}
+  @keyframes popIn{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
+  .result .match{font-size:13px;color:var(--accent);letter-spacing:.2em;margin-bottom:24px;font-weight:500}
+  .result .tags{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:24px}
+  .result .tags span{font-size:11px;padding:5px 13px;border:1px solid var(--line);color:var(--muted);letter-spacing:.05em;animation:fadeIn .5s ease both}
+  .result .tags span:nth-child(2){animation-delay:.1s}.result .tags span:nth-child(3){animation-delay:.2s}
+  .result .city-img{width:100%;height:160px;object-fit:cover;border-radius:2px;margin-bottom:22px;animation:fadeIn .6s .2s ease both}
+  .result .desc{font-family:var(--serif);font-size:15px;line-height:1.9;color:var(--ink);text-align:left;padding:0 6px;margin-bottom:18px;animation:fadeIn .6s .25s ease both}
+  .result .con{font-size:12px;color:var(--muted);font-style:italic;text-align:left;padding:14px 0 0 14px;margin-bottom:28px;border-left:2px solid var(--accent);line-height:1.8;animation:fadeIn .6s .35s ease both}
+  .about{text-align:left;padding:22px 0;border-top:1px solid var(--line);margin-bottom:28px;animation:fadeIn .6s .45s ease both}
+  .about h3{font-family:var(--serif);font-size:14px;letter-spacing:.2em;color:var(--accent);margin-bottom:12px;font-weight:600}
+  .about p{font-size:13.5px;color:var(--ink);line-height:1.9}
+  .other{padding:22px 0;border-top:1px solid var(--line);margin-bottom:28px;animation:fadeIn .6s .5s ease both}
+  .other .row{display:flex;justify-content:space-between;padding:10px 0;font-size:13px;color:var(--muted)}
+  .other .row b{color:var(--ink);font-weight:600}
+  .btn-row2{display:flex;gap:10px;animation:fadeIn .6s .6s ease both}
+  .again,.share-btn{flex:1;padding:14px 0;font-size:12px;letter-spacing:.2em;cursor:pointer;font-family:var(--sans);text-transform:uppercase;transition:all .2s}
+  .again{background:none;border:1px solid var(--line);color:var(--muted)}
+  .share-btn{background:var(--accent);color:#fff;border:1px solid var(--accent)}
+  .again:active{background:var(--line)}
+  .share-btn:active{transform:scale(.98)}
+  .share-hint{text-align:center;font-size:11px;color:var(--muted);margin-top:20px;letter-spacing:.1em;display:none}
+
+  /* sharing mode */
+  body.sharing .topbar,body.sharing .again,body.sharing .share-btn,body.sharing .other-label{display:none!important}
+  body.sharing .result{background:var(--card);padding:50px 26px;border:1px solid var(--line)}
+  body.sharing .back-share{display:inline-block!important}
+  .back-share{display:none;margin-top:24px;background:none;border:1px solid var(--ink);color:var(--ink);padding:12px 30px;font-size:11px;letter-spacing:.2em;cursor:pointer;font-family:var(--sans)}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar"><span>Living City Test</span><b>本命定居城市</b></div>
+
+  <section class="page active" id="coverPage">
+    <div class="cover">
+      <div class="eyebrow">15 Questions · 70 Cities</div>
+      <h1>测测你的<br>本命定居城市</h1>
+      <p class="sub">你最适合在哪长期定居？</p>
+      <p class="lead">从气候、潮湿、通勤、美食到包容度，十五道小题，算算哪座城市和你同频。</p>
+      <button class="cta" onclick="startQuiz()">开始测试</button>
+      <p class="meta">约需 2 分钟 · 不用注册 · 结果仅你可见</p>
+    </div>
+  </section>
+
+  <section class="page" id="quizPage">
+    <div class="quiz">
+      <div class="progress-row"><span id="qNum">01 / 15</span><span id="qPct">7%</span></div>
+      <div class="bar"><div class="fill" id="qFill"></div></div>
+      <div class="q-tag" id="qTag">气候</div>
+      <h2 id="qText"></h2>
+      <div id="opts"></div>
+      <div class="btn-row">
+        <button class="btn-back" id="prevBtn" onclick="prev()">← 上一题</button>
+        <button class="next" id="nextBtn" onclick="next()">下一题 →</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="page" id="resultPage">
+    <div class="result">
+      <div class="eyebrow">Your Match</div>
+      <div class="rank">N o . 1</div>
+      <h2 id="rName"></h2>
+      <div class="match">匹配度 <span id="rPct">0</span>%</div>
+      <div class="tags" id="rTags"></div>
+      <img class="city-img" id="rImg" alt="">
+      <p class="desc" id="rDesc"></p>
+      <p class="con" id="rCon"></p>
+      <div class="about" id="rAbout">
+        <h3>生活在这</h3>
+        <p id="rAboutText"></p>
+      </div>
+      <div class="other-label" style="font-size:10px;letter-spacing:.3em;color:var(--muted);margin-bottom:8px">— 另外两座也很合适 —</div>
+      <div class="other">
+        <div class="row"><span id="r2Name"></span><b id="r2Pct"></b></div>
+        <div class="row"><span id="r3Name"></span><b id="r3Pct"></b></div>
+      </div>
+      <div class="btn-row2">
+        <button class="again" onclick="restart()">重新测试</button>
+        <button class="share-btn" onclick="toggleShare(true)">生成分享图</button>
+      </div>
+      <button class="back-share" onclick="toggleShare(false)">← 返回</button>
+      <p class="share-hint">现在可以截图分享给朋友了 · #测测你的本命定居城市</p>
+    </div>
+  </section>
+</div>
+
+<script>
+const CITIES={
+bj:{n:"北京",t:["文化资源","四季分明","机会多"],img:"beijing",d:"博物馆、胡同、24小时便利店，你在这里不会无聊。适合那种「还想拼一把、也爱逛展看戏」的人——干燥的秋天最好，沙尘暴和通勤是代价。",c:"春天沙尘暴、通勤动辄两小时、冬天干到流鼻血。",a:"秋天是北京最好的季节，银杏黄在钓鱼台，你骑车穿过胡同，风里是糖炒栗子味。春天别来，柳絮和沙尘会教你做人。"},
+sh:{n:"上海",t:["精致","便利","国际化"],img:"shanghai",d:"下楼就是咖啡馆和书店，梧桐区走一百步就有故事。适合那种「要体面、要便利、也要看见世界」的人——你可以很孤独，也可以很精彩。",c:"贵、人情淡、冬天湿冷没暖气。",a:"你会学会在便利店买一盒鲜牛奶，在武康路排队二十分钟买个可颂。它对新人冷淡，但你待久了会发现，这种距离感其实很舒服。"},
+gz:{n:"广州",t:["美食天堂","包容","温暖"],img:"guangzhou",d:"早茶、夜宵、糖水铺，没人在意你今天穿什么。适合那种「会过日子、不攀比、把吃看得比天大」的人——这里对普通人最温柔。",c:"回南天墙壁滴水、夏天漫长、冬天没暖气。",a:"早上七点的茶楼，一盅两件，阿公阿婆看报纸看一上午。你在这里不会被judge，因为所有人都在忙自己的吃喝。"},
+sz:{n:"深圳",t:["年轻","机会多","天气暖"],img:"shenzhen",d:"凌晨两点还能点到外卖，所有人都在往前跑。适合那种「想搞钱、不想应付老派人情、喜欢新鲜」的人——你会交到朋友，但都很年轻。",c:"房价高、城市没根、排外感藏在细节里。",a:"这里没有本地人，大家都是来搞钱的。你不用解释你从哪来，也不用假装喜欢——下班后去海边走一圈，明天继续。"},
+cd:{n:"成都",t:["美食之都","慢节奏","包容"],img:"chengdu",d:"茶馆里盖碗茶翻开，火锅在锅里咕嘟。你不需要很努力，日子自己会软下来——这里适合那种「比起上升，更想把生活过好」的人。",c:"夏天闷热潮湿、冬天没有暖气，湿冷入骨。",a:"人民公园的茶馆十块钱坐一下午，掏耳朵的师傅会走过来问你要不要。钱在这里很经花，三十块能吃到撑。"},
+hz:{n:"杭州",t:["西湖","互联网","宜居"],img:"hangzhou",d:"西湖边走一圈，加班到九点也能看一眼月亮。适合那种「既要事业、又想住得舒服」的人——机会和风景，它都想给你。",c:"梅雨季长、房价高、互联网卷起来也不客气。",a:"春天太子湾的樱花，秋天满觉陇的桂花。你在写字楼里加班到十点，抬头还能看见宝石山。它把诗意和效率搅在了一起。"},
+cq:{n:"重庆",t:["魔幻","火锅","性价比高"],img:"chongqing",d:"导航在这里失灵，轻轨穿楼而过。适合那种「爱吃辣、耐得住热、喜欢江湖气」的人——钱在这里很经花，姑娘和火锅一样泼辣。",c:"夏天是火炉、爬坡上坎腿会废、潮湿。",a:"你住22楼，出门发现是1楼。火锅是九宫格，小面是早餐，山城的8D立体会让你迷路三个月。"},
+xa:{n:"西安",t:["历史","美食便宜","干燥"],img:"xian",d:"城墙根下吃泡馍，兵马俑就在东边。适合那种「爱历史、耐得住干燥、对生活成本敏感」的人——厚重，而且便宜。",c:"冬天冷、风大、夏天晒、春天有沙尘。",a:"你可以骑车绕城墙一圈，城墙上风很大。夜市的肉夹馍八块钱，羊肉泡馍自己掰馍，掰半小时才是仪式感。"},
+nj:{n:"南京",t:["梧桐","文艺","均衡"],img:"nanjing",d:"满城梧桐，秋天美到心碎。适合那种「想要大城市资源、又不想像沪杭那样卷」的人——它温和，有文化，不催你。",c:"梅雨季长、夏天闷热、冬天湿冷。",a:"秋天的颐和路，梧桐叶落满街。南京人说话有点大嗓门，但骨子里是温和的。它不像上海那样拒人千里。"},
+su:{n:"苏州",t:["园林","精致","近上海"],img:"suzhou",d:"园林、评弹、面馆，小桥流水人家不是传说。适合那种「喜欢江南、安静、对美有要求」的人——但你要能接受雨季。",c:"潮湿、夏天热、城市性格偏软。",a:"早上头汤面，下午园林里坐一会。苏州人讲究「落胃」，一碗面要汤清面劲。它不炫耀，但每处都精致。"},
+xm:{n:"厦门",t:["海边","文艺","慢"],img:"xiamen",d:"环岛路骑单车，鼓浪屿上住一晚。适合那种「喜欢海、小清新、对大城市没执念」的人——它小，但干净。",c:"城市小、物价不低、台风季有点折腾。",a:"沙坡尾的旧仓库改造成了咖啡馆，傍晚你沿着环岛路骑，海风把头发吹乱。厦门适合养老，不适合奋斗。"},
+qd:{n:"青岛",t:["海边","啤酒","德式建筑"],img:"qingdao",d:"红瓦绿树，啤酒用塑料袋打。适合那种「喜欢北方的海、爱喝两口、能接受潮湿夏天」的人——它浪漫，也市井。",c:"潮、风大、冬天冷、夏天游客挤爆。",a:"夏天的晚上，塑料袋装着原浆啤酒，就着烤鱿鱼。八大关的落叶秋天最美。青岛人的浪漫是啤酒给的。"},
+dln:{n:"大连",t:["干净","浪漫","海滨"],img:"dalian",d:"城市干净得像被洗过，有轨电车慢慢开。适合那种「喜欢北方海、耐得住冷、不爱人挤人」的人——它安静，有点被低估。",c:"冬天风大刺骨、工作机会少、冬天长。",a:"老有轨电车201路穿过市区，吱呀吱呀。冬天风是刀，但夏天不热。大连人嘴贫，爱开玩笑。"},
+km:{n:"昆明",t:["春城","四季如春","舒服"],img:"kunming",d:"全年二十度，花开不败。适合那种「怕热怕冷、就想躺平」的人——紫外线是唯一提醒。",c:"紫外线强、海拔高、冬天干、晚上冷。",a:"七月全国烤成狗，你在昆明穿薄外套。鲜花按斤卖，菌子季六月到八月，见手青见小人。"},
+dli:{n:"大理",t:["风花雪月","自由","慢"],img:"dali",d:"苍山洱海，随便找个院子住下。适合那种「想逃离、做自由职业、需要精神透气」的人——这里什么都慢，包括时间。",c:"小、冬天冷、基础设施一般、旺季拥挤。",a:"古城里的咖啡馆一坐一下午，你看苍山的云从头顶飘过。外地人比本地人多，大家都在躲什么。"},
+sy:{n:"三亚",t:["暖冬","海","度假感"],img:"sanya",d:"冬天二十多度，你在北方穿貂我在南方穿短袖。适合那种「怕冷、爱度假、能接受高物价」的人——它是用来过冬的。",c:"旺季贵、潮湿、紫外线强、城市感弱。",a:"冬天的东北老人占满了三亚的海滩。你住在海景房里，早上起来看海，下午去第一市场吃海鲜。"},
+cs:{n:"长沙",t:["夜生活","美食","快乐"],img:"changsha",d:"凌晨两点五一广场还在排队，茶颜悦色十块钱。适合那种「爱吃爱玩、能接受热」的人——这里快乐便宜。",c:"夏天巨热、漫长、冬天湿冷。",a:"文和友的复古场景，臭豆腐要黑色的。长沙人周末不睡觉，凌晨三点还在蹦迪。快乐在这里是批发的。"},
+hrb:{n:"哈尔滨",t:["冰雪","俄式建筑","热情"],img:"harbin",d:"冬天零下二十度，中央大街像童话。适合那种「喜欢雪、不怕冷、爱热闹」的人——这里人热情，冰棍在冬天卖。",c:"冬天极冷漫长、夏天短、经济一般。",a:"中央大街的面包石被踩得发亮，冬天你啃着马迭尔冰棍看冰雕。哈尔滨人嘴甜，叫你「老妹儿」。"},
+tj:{n:"天津",t:["松弛","相声","便宜"],img:"tianjin",d:"大爷大妈在公园聊天，煎饼果子八块钱。适合那种「想躺平、爱吃、不卷」的人——离北京近，但完全两个世界。",c:"冬天冷风大、工作机会少、城市性格有点佛。",a:"天津人说话像说相声，出租司机能给你唠一路。早点是锅巴菜和老豆腐，日子慢得像相声的垫话。"},
+fz:{n:"福州",t:["低调","宜居","温泉"],img:"fuzhou",d:"三坊七巷藏在闹市里，鱼丸和肉燕很便宜。适合那种「想安静、低调、喜欢烟火气」的人——它不争，也不吵。",c:"夏天热、潮湿、城市感弱、景点少。",a:"福州人泡茶比喝咖啡讲究，周末去泡温泉。它不像厦门那样文艺，但是真舒服。"},
+zh:{n:"珠海",t:["干净","海边","慢"],img:"zhuhai",d:"情侣路骑单车，澳门就在对岸。适合那种「养老式年轻、喜欢安静、不爱挤」的人——它干净得不像国内。",c:"小、夜生活少、工作机会少。",a:"情侣路很长，你骑车能骑一下午。对面就是澳门，周末过关去吃个葡挞。这里适合提前养老。"},
+nb:{n:"宁波",t:["富裕","干净","安静"],img:"ningbo",d:"老外滩、天一阁、海鲜面。适合那种「想过舒服日子、不爱挤、离上海一小时」的人——它有钱，但不炫耀。",c:"梅雨长、冬天湿冷、文化娱乐偏少。",a:"宁波人低调，开着奔驰去吃海鲜面。天一阁的书在恒温里睡着，老外滩的夜晚很安静。"},
+gy:{n:"贵阳",t:["凉爽","性价比高","慢"],img:"guiyang",d:"夏天平均23度，酸汤鱼很绝。适合那种「怕热、想躺平、爱吃酸」的人——爽爽的贵阳，不是白叫的。",c:"冬天阴冷、紫外线、发展一般、山多。",a:"你夏天不开空调，晚上还要盖被子。酸汤鱼是红酸，丝娃娃是裹着吃，贵阳人下午都在打麻将。"},
+ls:{n:"拉萨",t:["天空","信仰","慢"],img:"lhasa",d:"天空蓝得不真实，八廓街转经一圈。适合那种「需要精神放空、耐得住高原」的人——这里会重新教你什么叫慢。",c:"高反、干燥、小、医疗一般。",a:"八廓街的转经道，你跟着走一圈，念珠声嗡嗡的。甜茶馆里五块钱一壶，坐一下午没人管你。"},
+hhht:{n:"呼和浩特",t:["草原","开阔","爽利"],img:"hohhot",d:"出城就是草原，烧麦和奶茶管够。适合那种「喜欢开阔、不怕冷、想吃肉吃到爽」的人——这里人直，菜量也直。",c:"冬天巨冷、干燥、城市小。",a:"早茶是烧麦配砖茶，羊肉大葱馅。出城一小时就是草原，风从北边来，吹得你脑子清醒。"},
+wx:{n:"无锡",t:["太湖","精致","低调"],img:"wuxi",d:"太湖边的蠡园，酱排骨和小笼包。适合那种「喜欢江南、不爱挤、想过精致小日子」的人——它比苏州安静，比上海便宜。",c:"梅雨季、夏天热、城市存在感弱。",a:"春天鼋头渚的樱花，秋天太湖边吹风。无锡菜甜，但甜得舒服。它是那种被低估的宜居城市。"},
+fs:{n:"佛山",t:["武术","美食","近广州"],img:"foshan",d:"黄飞鸿的故乡，双皮奶和肠粉。适合那种「想住广州周边、但嫌广州贵」的人——地铁一小时到天河。",c:"夏天热、潮湿、城市感弱。",a:"早上吃碗猪杂粥，下午去祖庙看醒狮。佛山人务实，讲究「叹世界」，日子不慌不忙。"},
+qz:{n:"泉州",t:["世遗","半城烟火","慢"],img:"quanzhou",d:"半城烟火半城仙，关帝庙和清真寺挨着。适合那种「喜欢老城市、不爱网红打卡、想低调生活」的人——它活着，而且便宜。",c:"夏天热、交通乱、夏天长。",a:"老城区的巷子，你随便走，都是几百年的庙。面线糊加醋肉，泉州人早餐从这里开始。它比厦门野，比福州暖。"},
+wz:{n:"温州",t:["敢闯","海鲜","有钱"],img:"wenzhou",d:"温州人会做生意，海鲜是东海直接捞的。适合那种「喜欢新鲜食材、想安静过日子」的人——它低调，但有钱。",c:"夏天热、山多、冬天湿冷。",a:"乐清的黄鱼，苍南的梭子蟹。温州话像密码，外地人一句听不懂。它不炫耀，但骨子里硬。"},
+jx:{n:"嘉兴",t:["乌镇西塘","近上海","舒服"],img:"jiaxing",d:"乌镇西塘就在边上，粽子很好吃。适合那种「想离上海近、又不想住上海」的人——高铁二十分钟。",c:"梅雨季、城市小、夏天热。",a:"早上吃个肉粽，周末坐高铁去乌镇住一晚。嘉兴人会过日子，粽子按个买，端午吃一年。"},
+bh:{n:"北海",t:["海边","便宜","慢"],img:"beihai",d:"银滩的沙子细得像粉，海鲜便宜。适合那种「想看海、预算有限、想躺平」的人——它是低配版三亚。",c:"夏天热、台风、冬天凉、城市小。",a:"老街骑楼下吃虾饼，银滩看日落。北海的生活成本很低，三千块能过得很舒服。"},
+sgsh:{n:"香格里拉",t:["雪山","藏族","离天空近"],img:"shangrila",d:"松赞林寺的金顶，雪山在身后。适合那种「需要精神逃离、耐得住高反和冷」的人——它不是城市，是一种高度。",c:"海拔高、冬天冷、小、医疗一般。",a:"独克宗古城的转经筒要十几个人一起转。夏天山上开满杜鹃，冬天雪盖住一切。它不温柔，但震撼。"},
+dh:{n:"敦煌",t:["沙漠","莫高窟","艺术"],img:"dunhuang",d:"鸣沙山的沙子会唱歌，莫高窟的壁画看千年。适合那种「喜欢荒漠感、能待得住、爱艺术」的人——它小，但重。",c:"干燥、夏天热、冬天冷、小、医疗一般。",a:"早上骑骆驼看鸣沙山日出，下午在莫高窟看壁画。晚上戈壁的星星密得像撒了一把盐。"},
+whi:{n:"威海",t:["最干净海滨","人少","浪漫"],img:"weihai",d:"海岸线很长，国际海水浴场沙很细。适合那种「想看海、怕挤、想要干净」的人——它是北方最被低估的海。",c:"冬天冷、风大、工作机会少。",a:"环海路骑车，一半是山一半是海。威海人少，你可以一个人占一整条海岸线。"},
+jdz:{n:"景德镇",t:["瓷器","文艺","便宜"],img:"jingdezhen",d:"陶溪川的周六市集，满街都是手艺人。适合那种「搞创作、喜欢小众、想低成本生活」的人——全世界的陶艺青年都在这。",c:"小、夏天热、冬天冷、工作机会少。",a:"周六晚上陶溪川市集，你摆摊卖自己烧的杯子。这里的生活成本很低，艺术家比上班族多。"},
+wh:{n:"武汉",t:["江湖气","早餐之都","通透"],img:"wuhan",d:"热干面是早餐，长江穿城过。适合那种「直来直往、爱吃辣、耐得住热」的人——武汉人说话像吵架，但心是热的。",c:"夏天是火炉、冬天湿冷、夏天漫长。",a:"过早是武汉人的仪式感，一碗热干面站着吃完。长江大桥上吹风，武汉大学校园的樱花春天挤爆。"},
+
+/* ---- 国外 ---- */
+tyo:{n:"东京",t:["便利","安全","精致"],img:"tokyo",d:"地铁五分钟一班，便利店什么都有。适合那种「爱精致、爱便利、耐得住挤」的人——你可以很孤独，也可以很热闹。",c:"贵、压抑、孤独感、地震、夏天湿热。",a:"你晚上十一点下地铁，站口的拉面店还开着。东京的便利是骨子里的，但那种所有人都客气的距离感，有时候让人想哭。"},
+osa:{n:"大阪",t:["热闹","便宜","美食"],img:"osaka",d:"大阪人会拉你去喝酒，章鱼烧便宜又好吃。适合那种「爱吃爱玩、不喜欢东京那种精致距离感」的人——它接地气。",c:"夏天湿热、人有点杂、治安一般。",a:"道顿堀的格力高跑步人，大阪人叫「食い倒れ」（吃到破产）。他们热情，会跟你开玩笑，比东京人有人情味。"},
+kyo:{n:"京都",t:["古都","安静","文化"],img:"kyoto",d:"寺庙、町屋、樱花和红叶。适合那种「喜欢传统、慢、爱寺庙」的人——它适合住，不适合只旅游。",c:"小、季节极端、游客挤爆、夏天热。",a:"清晨五点的清水寺，没有游客，只有扫地的僧人。京都人讲究「間」（留白），连咖啡都喝得安静。"},
+sel:{n:"首尔",t:["时髦","咖啡","K文化"],img:"seoul",d:"整条街都是咖啡店，汉江边夜飞盘。适合那种「爱美妆、追k文化、耐得住冷」的人——它年轻，且卷。",c:"冬天冷、空气一般、内卷不输东亚。",a:"汉江边外卖炸鸡，江边坐着一群年轻人。首尔的咖啡文化比东京还卷，每一家都长得像画。"},
+sin:{n:"新加坡",t:["干净","安全","热带"],img:"singapore",d:"干净到有点假，下雨都是香的。适合那种「想要安全便利、不怕热、说中文就行」的人——它贵，但省心。",c:"贵、小、无聊、法律严、一直热。",a:"你半夜两点走在街头，不怕。但法律严到吃口香糖都罚款。新加坡是成年人的幼儿园，安全但无聊。"},
+bkk:{n:"曼谷",t:["便宜","美食","夜生活"],img:"bangkok",d:"711的冬阴功泡面就很好吃，夜市逛到凌晨。适合那种「想吃想玩、耐得住热和乱」的人——它混乱，但便宜。",c:"热、堵、空气一般、夏天长。",a:"夜市的芒果糯米饭四十泰铢，突突车在小巷里钻。曼谷乱，但那种混乱里有一种松弛。"},
+chx:{n:"清迈",t:["慢","山","数字游民"],img:"chiang-mai",d:"古城里咖啡馆比寺庙多。适合那种「远程工作、想躺、耐得住慢」的人——全世界的自由职业者都在这。",c:"小、热、夜生活少、城市有点灰。",a:"你在咖啡馆坐一天，旁边是德国程序员、英国作家。房租一千五一个月，生活很慢。"},
+par:{n:"巴黎",t:["艺术","浪漫","建筑"],img:"paris",d:"塞纳河边喝咖啡，卢浮宫下班前一小时免费。适合那种「爱文化、爱美、耐得住乱和贵」的人——它浪漫，但也很脏。",c:"贵、乱、小偷多、冬天阴、罢工。",a:"你在左岸的咖啡馆坐一下午，看路人。巴黎的浪漫是真的，地铁里的小偷也是真的。"},
+lon:{n:"伦敦",t:["博物馆","历史","多元"],img:"london",d:"大英博物馆免费，诺丁山彩色房子。适合那种「爱博物馆、耐得住阴雨、想要多元」的人——它阴，但丰富。",c:"贵、阴雨、冷、挤、夏天短。",a:"你在大英博物馆待一天，免费。伦敦的天气一天四季，但那种「什么人都有」的包容，别处没有。"},
+ber:{n:"柏林",t:["便宜","艺术","自由"],img:"berlin",d:"房租欧洲最低之一，夜店开到周一早上。适合那种「年轻人、搞创作、不爱攀比」的人——它粗糙，但自由。",c:"冷、潮、夏天短、经济一般。",a:"你住在一个 former 工厂改的艺术家工作室，房租三百欧。柏林不精致，但那种「没人管你」的自由很稀有。"},
+bcn:{n:"巴塞罗那",t:["海","高迪","阳光"],img:"barcelona",d:"海水蓝得不真实，高迪的房子像梦里建的。适合那种「喜欢阳光海和艺术、爱热闹」的人——它热情，也粗心。",c:"小偷多、贵、夏天热、游客挤。",a:"早上在 Barceloneta 海滩游泳，下午看圣家堂。巴塞罗那的阳光是免费的，小偷也是。"},
+lis:{n:"里斯本",t:["便宜","阳光","慵懒"],img:"lisbon",d:"电车28路晃上晃下，蛋挞刚出炉。适合那种「想躺、怕北欧那种贵、爱海边」的人——它便宜，且晒。",c:"小、夏天晒、工作机会少、有点破。",a:"电车28路穿过老城，你坐在车顶看日落。蛋挞配 bica（浓缩咖啡），里斯本的下午很长。"},
+rom:{n:"罗马",t:["历史","美食","阳光"],img:"rome",d:"走两步就是两千年的废墟。适合那种「爱历史、爱吃、能接受破和乱」的人——它乱，但值得。",c:"脏、小偷、夏天巨热、交通乱。",a:"你在古罗马遗址旁边吃披萨，三千年历史就在脚下。罗马不精致，但它的厚度是别的城市没有的。"},
+ams:{n:"阿姆斯特丹",t:["自行车","运河","包容"],img:"amsterdam",d:"全城骑车，大麻和红灯区都合法。适合那种「自由派、爱骑车、耐得住湿冷」的人——它开放，也宽容。",c:"贵、挤、冬天白天短、潮。",a:"你骑车穿过运河，两边是窄窄的老房子。阿姆斯特丹对一切奇怪的事都见怪不怪。"},
+vie:{n:"维也纳",t:["音乐","咖啡馆","宜居"],img:"vienna",d:"咖啡馆坐着一下午，古典乐随时有。适合那种「爱古典、想过体面小日子」的人——它被评过全球最宜居。",c:"闷、保守、夏天短、有点无聊。",a:"你中央咖啡馆坐一下午，喝 Melange，听隔壁老头讲贝多芬。维也纳的体面是刻在骨子里的。"},
+syd:{n:"悉尼",t:["海","阳光","户外"],img:"sydney",d:"海港大桥下面冲浪，周末都在外面。适合那种「爱户外、耐得住贵、不怕远」的人——它亮，且贵。",c:"贵、离中国远、夏冬反季、房租高。",a:"你 Bondi 海滩早上冲浪，下午喝啤酒。悉尼的生活就是户外，室内待着是浪费。"},
+mel:{n:"墨尔本",t:["文艺","咖啡","四季如春"],img:"melbourne",d:"咖啡馆藏在小巷里，天气一天四季。适合那种「爱咖啡文化、文艺青年、耐得住变天」的人——它文艺，且多变。",c:"天气善变、贵、冬天凉。",a:"你在 Flinders Lane 的小巷里找一家咖啡馆，墨尔本的咖啡文化是刻在 DNA 里的。天气一天变四次，你要随身带伞。"},
+yvr:{n:"温哥华",t:["山海","干净","华人多"],img:"vancouver",d:"雪山下海，出门就能滑雪冲浪。适合那种「喜欢自然、想要安全、能接受贵」的人——它完美，除了贵和雨。",c:"贵、雨多、税高、冬天灰。",a:"你开车一小时上山滑雪，一小时下海。温哥华的自然是真的好，但一年下半年雨也是真的。"},
+yyz:{n:"多伦多",t:["多元","华人多","工作机会"],img:"toronto",d:"地铁里听得见普通话。适合那种「移民、想吃中餐、耐得住冷」的人——它多元，且冷。",c:"冬天长冷、贵、车必备、除雪烦。",a:"你在 Downtown 听得见三十种语言。多伦多的冬天是真的长，但中餐是真的好。"},
+nyc:{n:"纽约",t:["机会","永不眠","文化"],img:"new-york",d:"地铁24小时，百老汇随时有戏。适合那种「想拼、爱热闹、耐得住贵和乱」的人——它是梦，也是压力。",c:"贵、挤、压力大、治安一般。",a:"你凌晨两点在布鲁克林桥上走，城市灯在脚下。纽约不会让你无聊，但它也不会让你轻松。"},
+sfo:{n:"旧金山",t:["科技","山海","自由"],img:"san-francisco",d:"金门大桥下风很大，硅谷半小时。适合那种「搞科技、爱自由、能接受贵和治安」的人——它 liberal，也贵。",c:"巨贵、无家可归者多、夏天凉、坡多。",a:"你在 Mission 区吃墨西哥卷，下午去金门公园。旧金山的坡能把你骑死，但风永远在吹。"},
+lax:{n:"洛杉矶",t:["阳光","海滩","开车文化"],img:"los-angeles",d:"全年阳光，海滩和健身房是生活方式。适合那种「爱阳光、必须有车、怕冷」的人——它分散，且灿烂。",c:"必须开车、空气一般、城市分散、地震带。",a:"你开车去 Malibu 看日落，堵车是日常。洛杉矶的阳光是免费的，但你得有车。"},
+akl:{n:"奥克兰",t:["帆船","自然","慢"],img:"auckland",d:"帆船之都，出门就是海湾。适合那种「想逃离、爱自然、能接受偏远」的人——它安静，也远。",c:"小、无聊、贵、离中国远、冬天凉。",a:"你开帆船出海，码头停满了船。奥克兰是全世界人均帆船最多的城市，慢得像另一个星球。"},
+zrh:{n:"苏黎世",t:["干净","安全","湖"],img:"zurich",d:"湖干净得能喝，火车准点到秒。适合那种「有钱、爱干净、耐得住无聊和贵」的人——它是瑞士的面子。",c:"巨贵、无聊、保守、食物一般。",a:"你在湖边跑步，水干净得想喝。苏黎世的准点和干净是极致，但晚上八点街上就没人了。"},
+prg:{n:"布拉格",t:["建筑美","便宜","欧洲心脏"],img:"prague",d:"老城广场像童话，啤酒比水便宜。适合那种「爱老城、预算有限、爱浪漫」的人——它便宜，且美。",c:"游客多、夏天热、工作机会少、有点商业化。",a:"查理大桥清晨五点没有游客，只有雕塑。布拉格的啤酒很便宜，老城的黄昏像电影。"},
+cph:{n:"哥本哈根",t:["幸福","骑行","设计"],img:"copenhagen",d:"全球最幸福城市，全城骑车。适合那种「爱设计、爱骑行、喜欢低调舒适」的人——它不炫耀，但舒服。",c:"贵、冬天黑、食物一般。",a:"你骑车上班，穿雨靴。哥本哈根的 hygge（ cozy）是刻在骨子里的，晚上点蜡烛喝热红酒。"},
+sth:{n:"斯德哥尔摩",t:["北欧","美","干净"],img:"stockholm",d:"群岛上的城市，秋天美的像画。适合那种「喜欢干净、耐得住冷、爱设计」的人——它冷，但美。",c:"贵、冬天黑、食物贵、慢。",a:"你在老城 Gamla Stan 走，彩色房子一排排。斯德哥尔摩的冬天下午三点就天黑，但那种美值得。"},
+edi:{n:"爱丁堡",t:["城堡","文艺","苏格兰"],img:"edinburgh",d:"城堡在死火山上，风笛在街头吹。适合那种「爱老城、文艺、耐得住雨」的人——它有点萧瑟，但浪漫。",c:"风大、雨多、冬天冷、小。",a:"你在 Royal Mile 走，风把裙子吹起来。爱丁堡的城堡看着全城，这里是 J.K.罗琳写哈利波特的地方。"},
+dub:{n:"都柏林",t:["酒馆","干净","文学"],img:"dublin",d:"圣殿区的酒馆，吉尼斯黑啤。适合那种「爱喝酒、爱文学、喜欢绿色」的人——它小，但敞亮。",c:"贵、雨多、冬天冷、工作机会有限。",a:"你在 Temple Bar 喝一杯黑啤，旁边有人唱民谣。都柏林的文学和酒一样浓。"},
+rek:{n:"雷克雅未克",t:["极光","极简","贵"],img:"reykjavik",d:"冬天看极光，夏天看极昼。适合那种「爱自然、耐得住贵和冷、想要极简」的人——它小，但世界尽头。",c:"巨贵、小、冬天黑、食物贵。",a:"你冬天半夜出门，天空绿得像假的。雷克雅未克只有十万人口，但它在世界尽头。"},
+ist:{n:"伊斯坦布尔",t:["横跨欧亚","香料市场","融合"],img:"istanbul",d:"一边欧洲一边亚洲，博斯普鲁斯海峡。适合那种「喜欢混杂、爱历史、爱热闹」的人——它乱，但迷人。",c:"堵、物价涨、夏天热、猫多。",a:"你在香料市场看一堆一堆的藏红花，渡轮穿过海峡，十分钟从欧洲到亚洲。伊斯坦布尔是两个世界撞在一起。"},
+hno:{n:"河内",t:["便宜","法棍","慢"],img:"hanoi",d:"老城区摩托车流，法棍配咖啡。适合那种「预算有限、爱法越混血、喜欢慢」的人——它乱，但便宜。",c:"热、摩托乱、空气一般、夏天长。",a:"你坐在路边小塑料凳上，喝滴漏咖啡。河内的街头是流动的，摩托车像河。"},
+kul:{n:"吉隆坡",t:["便宜","多元","热带"],img:"kuala-lumpur",d:"双子塔下，马来华人印度人混着。适合那种「想热带、预算有限、想吃各国菜」的人——它便宜，且杂。",c:"热、堵、雨多、城市有点旧。",a:"你在阿罗街吃沙嗲，旁边是印度清真寺。吉隆坡的多元是吃出来的，一块钱能吃很好。"},
+tlv:{n:"特拉维夫",t:["海滩","夜生活","中东硅谷"],img:"tel-aviv",d:"地中海沙滩，巴哈派对到天亮。适合那种「爱海滩、爱夜生活、能接受中东氛围」的人——它晒，且嗨。",c:"贵、局势紧张、夏天热、中东感。",a:"你早上在地中海游泳，晚上在 Florentin 区喝酒。特拉维夫是中东的叛逆儿子，自由得不像话。"},
+wel:{n:"惠灵顿",t:["小而美","风大","文艺"],img:"wellington",d:"新西兰首都，风很大，电影在这里拍。适合那种「喜欢小而美、爱文艺、耐得住风」的人——它小，但酷。",c:"风大、小、离中国远、冬天凉。",a:"你在 Weta Workshop 看指环王道具，港口风大得能把人吹走。惠灵顿是全世界最酷的小首都。"}
+};
+
+const QUESTIONS=[
+{tag:"气候",q:"如果一座城市要连下 40 天梅雨，衣服晾一周还是潮的，你会？",opts:[
+{t:"直接搬走，湿度是我的底线",s:{bj:3,xa:2,ls:2,hhht:2,km:1,lax:2,sfo:1,syd:1,wz:1}},
+{t:"买三台除湿机+烘干机，能凑合",s:{sh:2,hz:2,nj:2,su:2,nb:2,cs:1,cq:1,wx:1,fs:1}},
+{t:"无所谓，我反正都待在室内",s:{sz:2,gz:1,tyo:2,sel:2,sin:1,nyc:1,ist:1}},
+{t:"其实喜欢下雨的味道，反而安心",s:{lon:3,yvr:2,dli:1,cd:1,lis:1,edi:2,dub:2}}
+]},
+{tag:"季节",q:"你理想中的一年是？",opts:[
+{t:"夏天长一点，冬天别太冷",s:{gz:2,sz:2,sy:3,sin:2,bkk:2,lax:2,bh:2,ist:1,kul:2}},
+{t:"冬天长一点，最好有雪",s:{hrb:3,hhht:2,yyz:2,sel:2,nyc:1,prg:2,sth:2}},
+{t:"四季分明，每个季节都有仪式感",s:{bj:2,xa:1,nj:2,cd:2,par:1,rom:1,wx:1,wh:1}},
+{t:"全年恒温，穿一件卫衣走天下",s:{km:3,gy:2,lis:1,bcn:1,qz:1}}
+]},
+{tag:"节奏",q:"假如明天裸辞，你想先去过三个月什么样的日子？",opts:[
+{t:"每天不重样钻当地小馆，胖三斤也认了",s:{cd:3,cs:2,xa:1,osa:2,gz:2,fs:1}},
+{t:"找个能看山看海的地方，彻底断联躺平",s:{dli:3,km:1,chx:2,ls:2,akl:2,sy:1,sgsh:2,dh:1}},
+{t:"去大城市逛展、泡咖啡馆，顺便找下份工",s:{sh:2,tyo:2,nyc:2,lon:2,sfo:1,ber:1,tlv:1}},
+{t:"就在熟悉的城市换个住处，不挪窝",s:{tj:2,fz:2,zh:2,nb:1,hz:1,jx:1}}
+]},
+{tag:"通勤",q:"你理想中的通勤是？",opts:[
+{t:"步行10分钟到公司，楼下就是便利店",s:{sz:2,sh:1,gz:1,sin:1,tyo:1}},
+{t:"骑车20分钟，路上能拐去买咖啡",s:{ams:3,mel:2,cd:1,hz:1,cph:2}},
+{t:"坐40分钟地铁，窗外有风景、车上能看书",s:{bj:2,sh:1,lon:1,nyc:2,par:1}},
+{t:"远程办公，通勤就是从卧室走到书桌",s:{dli:3,chx:3,km:1,bcn:1,lis:1,jdz:2}}
+]},
+{tag:"美食",q:"凌晨两点饿醒，你最想吃的那一口是？",opts:[
+{t:"一碗热乎的粥，或者肠粉",s:{gz:3,sh:2,fz:2,nb:1,fs:1}},
+{t:"烧烤配冰啤酒，越夜越嗨",s:{cs:3,cq:2,qd:2,osa:2,bkk:2,wh:2}},
+{t:"楼下便利店的关东煮",s:{tyo:3,sel:2,sin:1,sz:1}},
+{t:"自己煮个泡面加蛋就够了",s:{ber:2,zrh:1,vie:1,akl:2,tj:1}}
+]},
+{tag:"社交",q:"周末没人约你，你的状态是？",opts:[
+{t:"太好了，终于可以在家瘫一天",s:{tj:2,nb:2,dli:1,ls:1,zrh:1,vie:1,sgsh:1}},
+{t:"约三五好友下馆子、喝酒",s:{cd:2,cs:2,osa:2,gz:2,qd:2,dub:2}},
+{t:"去商圈挤一挤，看人也开心",s:{sz:2,sh:2,tyo:1,nyc:2,bkk:2,ist:1}},
+{t:"一个人逛公园、书店、博物馆",s:{lon:3,par:2,ber:2,km:1,prg:2,kyo:2,edi:2}}
+]},
+{tag:"收入",q:"钱和生活，你更想要哪种？",opts:[
+{t:"钱够花就行，下班要有自己的时间",s:{cd:2,xa:2,tj:2,gy:2,chx:2,dli:2,qz:1}},
+{t:"收入高但忙，忙到没空花钱",s:{sz:3,sh:2,bj:2,nyc:2,sfo:3,tyo:2,sin:1,zrh:1}},
+{t:"收入中等，住得舒服、有点闲钱",s:{hz:2,nb:1,zh:1,yvr:1,mel:1,wx:1,cph:1}},
+{t:"在哪都行，能攒下钱最重要",s:{tj:2,hhht:1,ls:1,prg:1,lis:1,hno:2,kul:2}}
+]},
+{tag:"户外",q:"周末天气好，你更想？",opts:[
+{t:"去山里徒步、露营，远离人群",s:{ls:3,dli:2,km:2,yvr:2,syd:1,sfo:1,akl:2,sgsh:2,dh:1}},
+{t:"去海边或湖边发呆，看看水",s:{xm:2,qd:2,dln:2,sy:3,bcn:3,syd:2,lax:2,whi:2,bh:2,ist:1}},
+{t:"就在城市公园散步，别太远",s:{bj:1,sh:1,cd:1,par:1,vie:2,prg:2,wx:1}},
+{t:"哪都不去，天气好不如下馆子",s:{gz:2,cs:2,cq:2,osa:2,bkk:1}}
+]},
+{tag:"包容度",q:"你是个「不太合群」的人，你希望周围？",opts:[
+{t:"没人在意你怎么样，大家都忙自己的",s:{sz:2,bj:1,sh:1,nyc:2,ber:3,ams:2,sfo:2,tlv:2}},
+{t:"能交到和自己一样奇怪的朋友",s:{ber:3,tyo:1,mel:2,chx:2,dli:1,jdz:2}},
+{t:"周围人都友善热情，但有点爱打听",s:{cd:2,cq:2,gz:2,cs:2,osa:1,hrb:1}},
+{t:"大家生活方式都差不多，安稳省心",s:{tj:2,fz:2,nb:2,hhht:1,zrh:1,vie:1}}
+]},
+{tag:"夜生活",q:"晚上 10 点以后，你一般？",opts:[
+{t:"准备睡了，明天还要早起",s:{tj:2,nb:2,ls:2,vie:2,zrh:2}},
+{t:"刚出门，夜宵、酒吧、夜市才刚开始",s:{cs:3,cd:2,bkk:3,bcn:2,nyc:2,ber:2,tlv:2,ist:1}},
+{t:"在家追剧、打游戏，最舒服",s:{dli:2,km:1,chx:2,akl:2}},
+{t:"在加班，或者刚下班",s:{sz:2,sh:1,bj:2,sfo:2,tyo:1,nyc:1}}
+]},
+{tag:"夏天",q:"夏天 40 度高温，你的反应是？",opts:[
+{t:"空调 24 度不出门，能点外卖绝不 walk",s:{bj:1,sh:1,sz:1,sin:2,nyc:1,sfo:1}},
+{t:"太热了，但傍晚出去走走还行",s:{cd:1,hz:1,cq:1,cs:1,rom:1}},
+{t:"去山里、海边避暑，反正我有假",s:{km:2,dli:2,qd:1,xm:2,sy:3,gy:2,whi:2}},
+{t:"无所谓，我怕热但也能扛",s:{gz:2,xa:1,lis:1,bcn:1,bkk:1,hno:1}}
+]},
+{tag:"文化",q:"你一年大概会去几次博物馆、展览、现场演出？",opts:[
+{t:"每月都去，不去憋得慌",s:{bj:3,sh:2,lon:3,par:3,nyc:2,ber:2,tyo:1,sfo:1}},
+{t:"有热门展才去，一年三四次",s:{cd:1,hz:1,nj:1,mel:2,sfo:1,edi:2,wel:2}},
+{t:"基本不去，更爱逛街吃饭",s:{gz:2,cs:2,cq:2,osa:2,bkk:1,fs:1}},
+{t:"完全不感兴趣，这些跟我无关",s:{tj:2,hhht:2,ls:1,dln:1,akl:1}}
+]},
+{tag:"城市大小",q:"你理想中的城市大小是？",opts:[
+{t:"大城市，越大越好，资源多",s:{sh:3,bj:2,sz:2,nyc:3,tyo:2,lon:1}},
+{t:"中等城市，生活方便又不挤",s:{cd:2,hz:1,nj:1,xm:1,qd:1,vie:2,wx:1,fs:1}},
+{t:"小城或县城，半小时从城东走到城西",s:{dli:3,fz:2,zh:2,tj:2,prg:2,lis:2,qz:2,bh:1,jdz:1}},
+{t:"无所谓大小，舒服就行",s:{km:2,gy:1,nb:1,mel:1}}
+]},
+{tag:"融入",q:"到一个新地方，你更想？",opts:[
+{t:"快速学会当地话、美食、规矩，融入本地",s:{cd:1,cs:1,gz:2,xa:1,hrb:2,qz:2}},
+{t:"哪里都是中国人，说普通话就行",s:{sz:2,gz:1,sin:2,yvr:1,yyz:2}},
+{t:"喜欢那种「谁也不认识谁」的陌生感",s:{nyc:2,ber:2,tyo:2,sfo:1,ams:1,tlv:1}},
+{t:"最好周围都是和我一样的外地人",s:{sz:2,dli:3,chx:2,sy:1,bkk:1,jdz:1}}
+]},
+{tag:"冬天",q:"你理想中的冬天是？",opts:[
+{t:"一定要有暖气，室外冻室内穿短袖",s:{bj:3,hrb:3,hhht:3,xa:2,yyz:2,sel:2,nyc:1,sth:1}},
+{t:"湿冷就行，我习惯了",s:{cd:2,hz:2,sh:2,nj:2,gz:1,cs:2,fs:1}},
+{t:"最好不下雪，十几度最舒服",s:{gz:2,sz:2,sy:3,lis:1,bcn:1,bh:2}},
+{t:"必须有雪，没有雪的冬天不算冬天",s:{hrb:3,hhht:2,prg:2,vie:1,rom:1,yvr:1,sgsh:1,dh:1,rek:1}}
+]}
+];
+
+let cur=0;
+const scores={};
+Object.keys(CITIES).forEach(k=>scores[k]=0);
+const prevAnswers=[];
+
+function startQuiz(){
+  document.getElementById('coverPage').classList.remove('active');
+  document.getElementById('quizPage').classList.add('active');
+  cur=0; renderQ();
+}
+function renderQ(){
+  const Q=QUESTIONS[cur];
+  document.getElementById('qNum').textContent=String(cur+1).padStart(2,'0')+" / 15";
+  document.getElementById('qPct').textContent=Math.round(cur/15*100)+"%";
+  document.getElementById('qFill').style.width=(cur/15*100)+"%";
+  document.getElementById('qTag').textContent=Q.tag;
+  document.getElementById('qText').textContent=Q.q;
+  const box=document.getElementById('opts');
+  box.innerHTML='';
+  Q.opts.forEach((o,i)=>{
+    const d=document.createElement('div');
+    d.className='opt';
+    d.innerHTML=`<span class="key">${'ABCD'[i]}</span><span>${o.t}</span>`;
+    d.onclick=()=>selectOpt(d,i);
+    box.appendChild(d);
+  });
+  // restore previous selection
+  if(prevAnswers[cur]!==undefined){
+    const opts=document.querySelectorAll('#opts .opt');
+    opts[prevAnswers[cur]].classList.add('selected');
+    window._sel=prevAnswers[cur];
+    document.getElementById('nextBtn').classList.add('ready');
+  } else {
+    window._sel=-1;
+    document.getElementById('nextBtn').classList.remove('ready');
+  }
+  document.getElementById('prevBtn').classList.toggle('ready',cur>0);
+}
+function selectOpt(el,i){
+  document.querySelectorAll('#opts .opt').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+  window._sel=i;
+  prevAnswers[cur]=i;
+  document.getElementById('nextBtn').classList.add('ready');
+}
+function prev(){
+  if(cur>0){ cur--; renderQ(); window.scrollTo({top:0}); }
+}
+function next(){
+  if(window._sel<0) return;
+  const chosen=QUESTIONS[cur].opts[window._sel];
+  Object.entries(chosen.s).forEach(([k,v])=>{ if(scores[k]!==undefined) scores[k]+=v; });
+  cur++;
+  if(cur>=QUESTIONS.length){ showResult(); }
+  else renderQ();
+  window.scrollTo({top:0});
+}
+function showResult(){
+  document.getElementById('quizPage').classList.remove('active');
+  document.getElementById('resultPage').classList.add('active');
+  const ranked=Object.entries(scores).sort((a,b)=>b[1]-a[1]);
+  const top3=ranked.slice(0,3).map(([k,v])=>({...CITIES[k],score:v}));
+  const max=top3[0].score;
+  const p1=Math.round(86+Math.min(12,max*0.6));
+  const p2=Math.round(p1-Math.max(4,max-top3[1].score)*3);
+  const p3=Math.round(p1-Math.max(8,max-top3[2].score)*3);
+  document.getElementById('rName').textContent=top3[0].n;
+  document.getElementById('rDesc').textContent=top3[0].d;
+  document.getElementById('rCon').textContent="小缺点："+top3[0].c;
+  document.getElementById('rAboutText').textContent=top3[0].a;
+  document.getElementById('rTags').innerHTML=top3[0].t.map(x=>`<span>${x}</span>`).join('');
+  document.getElementById('r2Name').textContent=top3[1].n;
+  document.getElementById('r2Pct').textContent=p2+"%";
+  document.getElementById('r3Name').textContent=top3[2].n;
+  document.getElementById('r3Pct').textContent=p3+"%";
+  // image
+  const img=document.getElementById('rImg');
+  img.src=`https://source.unsplash.com/600x300/?${top3[0].img},city`;
+  img.onerror=()=>{img.style.display='none';};
+  img.onload=()=>{img.style.display='block';};
+  // animate pct
+  let p=0;const target=p1;
+  const el=document.getElementById('rPct');
+  const t=setInterval(()=>{p+=1;el.textContent=p;if(p>=target)clearInterval(t);},25);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function restart(){
+  Object.keys(scores).forEach(k=>scores[k]=0);
+  prevAnswers.length=0;
+  document.getElementById('resultPage').classList.remove('active');
+  document.body.classList.remove('sharing');
+  document.getElementById('coverPage').classList.add('active');
+  window.scrollTo({top:0});
+}
+function toggleShare(on){
+  document.body.classList.toggle('sharing',on);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+</script>
+</body>
+</html>
